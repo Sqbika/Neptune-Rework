@@ -15,7 +15,7 @@ if (DEV) {
 }
 
 var bot = new Discord.Client();
-
+//
 
 /* Initializaton phase */
 
