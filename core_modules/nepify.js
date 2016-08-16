@@ -28,7 +28,7 @@ Nepify.prototype.log = function (message, level) {
           case "CHAT":
                 
 
-          case default:
+          default:
             this.log("No such log level: " + level, "ERROR");
             break;
      }
