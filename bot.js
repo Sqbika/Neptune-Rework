@@ -1,6 +1,7 @@
 var INITIALIZATION_MS = new Date();
 var discord = require('discordj.js');
 var helper = require('./helper.js');
+var config = require('./config.json');
 
 var DEV = false;
 
@@ -22,5 +23,7 @@ var bot = new Discord.Client();
 bot.loginWithToken(auth.key);
 
 bot.on("ready", function () {
-    
+    bot.setPlayingGame(config.playing);
+    if (config.extendedLog)
+        
 });
