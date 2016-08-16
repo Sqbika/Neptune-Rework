@@ -2,6 +2,7 @@ var INITIALIZATION_MS = new Date();
 var discord = require('discordj.js');
 var helper = require('./helper.js');
 var config = require('./config.json');
+var log = require('./core_modules/nepify.js');
 
 var DEV = false;
 
@@ -23,7 +24,10 @@ var bot = new Discord.Client();
 bot.loginWithToken(auth.key);
 
 bot.on("ready", function () {
+    var readyTime = (new Date() - INITIALIZATION_MS);
     bot.setPlayingGame(config.playing);
-    if (config.extendedLog)
+    if (config.extendedLog) {
+        log.log("Logged in, Took " + readyTime + " ms", "INFO");
         
+    }
 });
