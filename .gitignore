@@ -253,3 +253,4 @@ login/selfbot.json
 typings/
 Neptune Rework.njsproj
 typings.json
+core_modules\permission\permissions.json
