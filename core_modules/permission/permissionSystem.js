@@ -62,17 +62,17 @@ PermissionSystem.prototype.hasPermission = function (user, permission, callback)
     if (helper.isNumeric(user)) {
         if (helper.scontains(permissions.users, user)) {
             if (helper.scontains(permissions.users[user], permission)) {
-                callback(false, true);
+                return true;
             }
-            callback(false, false);
+            return false;
         }
         callback(true, "No user " + user + " found in permission database.");
     } else {
         if (helper.scontains(permissions.users, user.id)) {
             if (helper.scontains(permissions.users[user.id], permission)) {
-                callback(false, true);
+                return true;
             }
-            callback(false, false);
+            return false;
         }
         callback(true, "No user " + user.id + " found in permission database.");
     }
