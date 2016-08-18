@@ -1,0 +1,5 @@
+{
+  owner: 0123456789123,
+  default: ["bot.time", "bot.users", "bot.online", "reddit.*"],
+  1234567810213: default + ["4chan.*", "log.*"], 
+}
