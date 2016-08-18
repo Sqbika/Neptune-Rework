@@ -1,3 +1,5 @@
+var log = require('./core_modules/nepify.js');
+
 module.exports = {
     parseUgly: parseUgly,
     whiteSpace: whiteSpace,
@@ -8,6 +10,15 @@ module.exports = {
     forHumans: forHumans,
     parseData: parseData,
     scontains: scontains,
+    handleCallback: HandleCallback
+}
+
+
+function HandleCallback(err, msg) {
+    if (err)
+        log.log(msg, "ERROR");
+    else
+        log.log(msg, "INFO");
 }
 
 var data = ['B', 'KB', 'MB', 'GB', 'TB'];
