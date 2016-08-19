@@ -10,7 +10,7 @@ module.exports = {
                 name: "Test1 command",
                 prefix: "test",
                 permission: "test1",
-                parameters: {},
+                parameters: [],
                 handler: test1
             },
 
@@ -18,10 +18,11 @@ module.exports = {
                 name: "Test2 command",
                 prefix: "test2",
                 permission: "test2",
-                parameters: {
-                    strict: false,
-                    string: name
-                },
+                parameters: [{
+                    id: "name",
+                    type: string,
+                    req: false
+                }],
                 handler: test2
             }
         }
@@ -32,6 +33,6 @@ function test1(callback) {
     callback(false, "Test1 Works.");
 }
 
-function test2(name, callback) {
-    callback(false, "I've got this as a parameter: " + name);
+function test2(callback, args) {
+    callback(false, "I've got this as a parameter: " + args.name);
 }
