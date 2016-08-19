@@ -20,8 +20,8 @@ module.exports = {
                 permission: "test2",
                 parameters: [{
                     id: "name",
-                    type: string,
-                    req: false
+                    type: "string",
+                    req: true
                 }],
                 handler: test2
             }

@@ -1,20 +1,25 @@
 var fs = require('fs');
-var log = require('../nepify.js');
-var helper = require('../../helper.js');
 
 var permissions;
 
 module.exports = PermissionSystem;
 
-function PermissionSystem() {
+var log;
+var helper;
+
+function PermissionSystem(Log, Helper) {
+    log = Log;
+    helper = Helper;
+
     try {
-        permissions = require('permissions.json');
+        permissions = require('./permissions.json');
+        log.log("Loaded permissions", "INFO");
     } catch (e) {
         log.log("No permissions.json found! Creating one.", "WARN");
         var config = require('../../config.json');
         var def = {
             config: {
-                owner: config.author,
+                owner: config.owner,
                 default: [],
                 mods: [],
                 admins: [],
@@ -23,8 +28,8 @@ function PermissionSystem() {
 
             }
         }
-        fs.writeFile("./core_modules/permission/permissions.json", JSON.stringify(def), function (err, msg) {
-         permissions = require('./permissions.json');
+        fs.writeFile("./core_modules/permission/permissions.json", JSON.stringify(def), function (err) {
+            permissions = require('./permissions.json');
         });
     }
 }

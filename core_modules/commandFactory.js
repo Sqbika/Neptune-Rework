@@ -1,6 +1,4 @@
 var fs = require('fs');
-var log = require('./nepify.js');
-var helper = require('../helper.js');
 
 const fspath = "./modules/";
 const path = "../modules/";
@@ -9,20 +7,20 @@ var modules = [];
 
 module.exports = CommandFactory;
 
-function Module(moduleName, permission, subcommands, author, version) {
-    this.moduleName = moduleName;
-    this.permission = permission;
-    this.subcommands = subcommands;
-    this.author = author;
-    this.version = version;
+function Module(ModuleName, Permission, Subcommands, Author, Version) {
+    this.moduleName = ModuleName;
+    this.permission = Permission;
+    this.subcommands = Subcommands;
+    this.author = Author;
+    this.version = Version;
 }
 
-function Command(name, prefix, permission, parameters, handler) {
-    this.name = name;
-    this.prefix = prefix;
-    this.permission = permission,
-    this.handler = handler;
-    this.parameters = parameters;
+function Command(Name, Prefix, Permission, Parameters, Handler) {
+    this.name = Name;
+    this.prefix = Prefix;
+    this.permission = Permission,
+    this.handler = Handler;
+    this.parameters = Parameters;
     this.onCommand = false;
 }
 
@@ -51,7 +49,7 @@ CommandFactory.prototype.loadModule = function(name, path, callback) {
     }
     if (mod.MODULE !== undefined) {
         var curModule = mod.MODULE;
-        modules.push(Module(curModule.name, curModule.permission, loadSubCommands(curModule.commands), curModule.author, curModule.version));
+        modules.push(new Module(curModule.name, curModule.permission, loadSubCommands(curModule.commands), curModule.author, curModule.version));
         callback(false, curModule.name + " loaded.");
     } else {
         callback(true, "Error loading module: " + name + ". Not a valid module! Skipping.");
@@ -59,13 +57,15 @@ CommandFactory.prototype.loadModule = function(name, path, callback) {
 }
 
 CommandFactory.prototype.getSubCommand = function(command) {
+    var result = -1;
     modules.forEach(m => {
-        m.forEach(c => {
-            if (c.prefix == command)
-                return c;
+        m.subcommands.forEach(c => {
+            if (c.prefix == command) {
+                result = c;
+            }
         });
     });
-    return -1;
+    return result;
 }
 
 CommandFactory.prototype.getModule = function(moduleName) {
@@ -77,8 +77,8 @@ CommandFactory.prototype.getModule = function(moduleName) {
 
 function loadSubCommands(arrayOfCommands) {
     var subcmd = [];
-    arrayOfCommands.forEach(cmd => {
-        subcmd.push(Command(subcmd.name, subcmd.prefix, subcmd.permission, subcmd.handler, subcmd.parameters));
+    Object.keys(arrayOfCommands).forEach(cmd => {
+        subcmd.push(new Command(arrayOfCommands[cmd].name, arrayOfCommands[cmd].prefix, arrayOfCommands[cmd].permission, arrayOfCommands[cmd].parameters, arrayOfCommands[cmd].handler));
     });
     return subcmd;
 }

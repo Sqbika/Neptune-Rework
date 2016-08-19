@@ -1,5 +1,3 @@
-var log = require('./core_modules/nepify.js');
-
 module.exports = {
     parseUgly: parseUgly,
     whiteSpace: whiteSpace,
@@ -10,9 +8,15 @@ module.exports = {
     forHumans: forHumans,
     parseData: parseData,
     scontains: scontains,
-    handleCallback: HandleCallback
+    handleCallback: HandleCallback,
+    init: init
 }
 
+function init(Log) {
+    log = Log;
+}
+
+var log;
 
 function HandleCallback(err, msg) {
     if (err)

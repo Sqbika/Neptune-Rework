@@ -1,20 +1,19 @@
 var chalk = require('chalk');
-var helper = require('../helper.js');
 var io = require('fs');
 
-module.exports = {
-      init: Nepify,
-      levels: levels,
-      log: log
-};
+module.exports = Nepify;
+
+var crash;
+var error;
+var commands;
 
 function Nepify() {
-    var crash = io.openFileStream('../logs/crash.log');
-    var error = io.openFileStream('../logs/error.log');
-    var commands = io.openFileStream('../logs/commands.log');
+    crash = io.createWriteStream('./logs/crash.log');
+    error = io.createWriteStream('./logs/error.log');
+    commands = io.createWriteStream('./logs/commands.log');
 }
 
-var levels = [
+Nepify.prototype.levels = [
     "CHAT",
     "COMMAND",
     "INFO",
@@ -23,14 +22,17 @@ var levels = [
     "CRASH"
 ]
 
-function log (message, level) {
+Nepify.prototype.log  = function (message, level) {
      switch(level)
      {
           case "CHAT":
                 console.log("[" + chalk.cyan(message.server.name) + "][" + chalk.yellow(message.channel.name) + " - [" + chalk.green(message.author.username) + "] - " + chalk.white(message.content));
                 break;
+          case "LOG":
+                console.log(`[${chalk.blue("Log")}] - ${message}`);
+                break;
           case "COMMAND":
-               // commands.write(`[Command] ${message}`);
+                commands.write(`[Command] ${message}`);
                 break;
           case "INFO":
                 console.log(`[${chalk.yellow("Info")}] - ${message}`);
@@ -40,14 +42,14 @@ function log (message, level) {
                 break;
           case "ERROR":
                 console.log(`[${chalk.red("ERROR")}] - ${message}`);
-               // error.write(`[ERROR] ${message}`);
+                error.write(`[ERROR] ${message}`);
                 break;
           case "CRASH":
                 console.log(`${chalk.red("Crash Happened!")}\n ${message}`);
-              //  crash.write(`Crash happened at: ${new Date()} \n Stacktrace:\n${message}`);
+                crash.write(`Crash happened at: ${new Date()} \n Stacktrace:\n${message}`);
                 break;
           default:
-            this.log("No such log level: " + level, "ERROR");
+            log("No such log level: " + level, "ERROR");
             break;
      }
 }

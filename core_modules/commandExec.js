@@ -1,50 +1,84 @@
-var helper = require('../helper.js');
-var log = require('./nepify.js');
+var helper;
+var log;
 var factory;
 var pSystem;
 var bot;
 
 module.exports = CommandExecutor;
 
-function CommandExecutor(cmdFactory, PSystem, DBot) {
+function CommandExecutor(cmdFactory, PSystem, DBot, Helper, Log) {
     factory = cmdFactory;
     pSystem = PSystem;
     bot = DBot;
+    helper = Helper;
+    log = Log;
 }
 
-CommandExecutor.prototype.tryExec = function (command, parameters, userID, callback) {
+CommandExecutor.prototype.tryExec = function(command, parameters, userID, callback) {
     var command = factory.getSubCommand(command);
-    
-    if (command == -1)
+    var self = this;
+    if (command == -1) {
         callback(true, "Command Not Found.");
-    if (pSystem.hasPermission(userID, command.permission, function (err, msg) { helper.handleCallback(err, msg) })) {
+    } else if (pSystem.hasPermission(userID, command.permission, function(err, msg) {
+            helper.handleCallback(err, msg)
+        })) {
         try {
-            log.log("User " + userID + " issued command: " + command, "LOG");
-            command.handler(function (err, msg) {
-                callback(err, msg);
-            }, argParser(command, parameters));
+            var args = self.argParser(command, parameters);
+            if (checkParameters(args, command)) {
+                log.log("User " + userID + " issued command: " + command.prefix, "LOG");
+                command.handler(function(err, msg) {
+                    callback(err, msg);
+                }, args);
+            } else {
+                callback(true, "Parameter error.");
+            }
         } catch (e) {
             log.log("Error occured while executing command. Error: " + e, "ERROR");
             callback(e, "Error executing command.");
         }
+    } else {
+        callback(true, "No Permission!");
     }
 }
 
-CommandExecutor.prototype.stringParser = function (string) {
-    var aStr = string.match(/\w+|"[^"]+"/g), i = aStr.length;
-    while(i--){
-        aStr[i] = aStr[i].replace(/"/g,"");
+CommandExecutor.prototype.stringParser = function(string) {
+    var aStr = string.match(/\w+|"[^"]+"/g),
+        i = aStr.length;
+    while (i--) {
+        aStr[i] = aStr[i].replace(/"/g, "");
     }
 
-    this.prefix = aStr[0];
-    this.subCommand = aStr[1];
-    this.parameters = aStr.slice(2,aStr.length-1);
-}
-
-CommandExecutor.prototype.argParser = function (command, parameters) {
     var result = {};
-    for (var i = 0; i < Object.keys(command.parameters).length; i++) {
-        result[command.parameters[i].id] = parameters[i];
+
+    result.prefix = aStr[0];
+    result.subCommand = aStr[1];
+    result.parameters = aStr.slice(2, aStr.length);
+    return result;
+}
+
+CommandExecutor.prototype.argParser = function(command, parameters) {
+    var result = {};
+    if (parameters) {
+        for (var i = 0; i < Object.keys(command.parameters).length; i++) {
+            result[command.parameters[i].id] = parameters[i];
+        }
     }
+    return result;
+}
+
+function checkParameters(issued, command) {
+    var result = true;
+    Object.keys(command.parameters).forEach(param => {
+        param = command.parameters[param];
+        if (param.req) {
+            if (issued[param.id]) {
+                if (typeof(issued[param.id]) !== param.type) {
+                    result = false;
+                }
+            } else {
+                result = false;
+            }
+        }
+    });
     return result;
 }
