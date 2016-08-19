@@ -4,6 +4,8 @@ var factory;
 var pSystem;
 var bot;
 
+module.exports = CommandExecutor;
+
 function CommandExecutor(cmdFactory, PSystem, DBot) {
     factory = cmdFactory;
     pSystem = PSystem;

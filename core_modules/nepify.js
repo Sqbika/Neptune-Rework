@@ -2,7 +2,11 @@ var chalk = require('chalk');
 var helper = require('../helper.js');
 var io = require('fs');
 
-module.exports = Nepify;
+module.exports = {
+      init: Nepify,
+      levels: levels,
+      log: log
+};
 
 function Nepify() {
     var crash = io.openFileStream('../logs/crash.log');
@@ -10,7 +14,7 @@ function Nepify() {
     var commands = io.openFileStream('../logs/commands.log');
 }
 
-Nepify.prototype.levels = [
+var levels = [
     "CHAT",
     "COMMAND",
     "INFO",
@@ -19,14 +23,14 @@ Nepify.prototype.levels = [
     "CRASH"
 ]
 
-Nepify.prototype.log = function (message, level) {
+function log (message, level) {
      switch(level)
      {
           case "CHAT":
                 console.log("[" + chalk.cyan(message.server.name) + "][" + chalk.yellow(message.channel.name) + " - [" + chalk.green(message.author.username) + "] - " + chalk.white(message.content));
                 break;
           case "COMMAND":
-                commands.write(`[Command] ${message}`);
+               // commands.write(`[Command] ${message}`);
                 break;
           case "INFO":
                 console.log(`[${chalk.yellow("Info")}] - ${message}`);
@@ -36,11 +40,11 @@ Nepify.prototype.log = function (message, level) {
                 break;
           case "ERROR":
                 console.log(`[${chalk.red("ERROR")}] - ${message}`);
-                error.write(`[ERROR] ${message}`);
+               // error.write(`[ERROR] ${message}`);
                 break;
           case "CRASH":
                 console.log(`${chalk.red("Crash Happened!")}\n ${message}`);
-                crash.write(`Crash happened at: ${new Date()} \n Stacktrace:\n${message}`);
+              //  crash.write(`Crash happened at: ${new Date()} \n Stacktrace:\n${message}`);
                 break;
           default:
             this.log("No such log level: " + level, "ERROR");

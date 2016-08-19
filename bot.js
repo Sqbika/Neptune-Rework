@@ -1,12 +1,15 @@
 var INITIALIZATION_MS = new Date();
-var discord = require('discordj.js');
+var Discord = require('discord.js');
 var helper = require('./helper.js');
 var config = require('./config.json');
+var execPath = require('./core_modules/commandExec.js');
 var log = require('./core_modules/nepify.js');
-var cmdFactory = require('./core_modules/commandFactory.js');
-var pSystem = require('./core_modules/permissionSystem.js');
+var cmdFactory = new (require('./core_modules/commandFactory.js'));
+var pSystem = new (require('./core_modules/permission/permissionSystem.js'));
 
 var DEV = false;
+
+//log.init();
 
 process.argv.forEach(function(val, index, array) {
     if (val === "dev") DEV = true;
@@ -19,7 +22,7 @@ if (DEV) {
 }
 
 var bot = new Discord.Client();
-var exec = require('./core_modules/commandExec.js')(cmdFactory, pSystem, bot);
+var exec = new execPath(cmdFactory, pSystem, bot);
 ////
 
 /* Initializaton phase */

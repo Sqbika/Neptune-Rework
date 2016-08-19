@@ -1,11 +1,13 @@
 var fs = require('fs');
 var log = require('./nepify.js');
-var helper = require('./helper.js');
+var helper = require('../helper.js');
 
-const path = "../../modules/";
+const fspath = "./modules/";
+const path = "../modules/";
 
 var modules = [];
 
+module.exports = CommandFactory;
 
 function Module(moduleName, permission, subcommands, author, version) {
     this.moduleName = moduleName;
@@ -29,11 +31,12 @@ function CommandFactory() {}
 CommandFactory.prototype.modules = modules;
 
 CommandFactory.prototype.loadModules = function(callback) {
-    var files = fs.readdirSync(path);
+    var self = this;
+    var files = fs.readdirSync(fspath);
     files.forEach(function(f) {
-        var isDir = fs.statSync(path + f);
+        var isDir = fs.statSync(fspath + f);
         if (!isDir.isDirectory())
-            this.loadModule(f, path + f, function(err, msg) {
+            self.loadModule(f, path + f, function(err, msg) {
                 callback(err, msg)
             });
     });
@@ -44,8 +47,7 @@ CommandFactory.prototype.loadModule = function(name, path, callback) {
     try {
         var mod = require(path);
     } catch (e) {
-        callback(false, "Error loading plugin: " + path + " Stacktrace: " + e);
-        log.log("Error loading plugin: " + path + " Stacktrace: " + e, "ERROR");
+        callback(true, "Error loading plugin: " + path + " Stacktrace: " + e);
     }
     if (mod.MODULE !== undefined) {
         var curModule = mod.MODULE;
