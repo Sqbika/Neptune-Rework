@@ -1,0 +1,37 @@
+module.exports = {
+    "MODULE": {
+        name: "Module Name",
+        permission: "perm_group",
+        author: "Your name",
+        version: "version number",
+        commands: {
+            "subcmd1": {
+                name: "SubCommand Name",
+                prefix: "command call ([botPrefix] prefix",
+                permission: "perm_sub_perm",
+                parameters: ["list of parameters"],
+                handler: "function call (subcmd1function)",
+            },
+
+            "subcmd2": {
+                name: "SubCommand 2 Name",
+                prefix: "nep subcmd2",
+                permission: "subcmd2",
+                parameters: [],
+                handler: "",
+            },
+}
+
+function subcmd1function(bot, msg, args, callback) {
+    /*bot = the discord.js bot,
+    msg = the msg recevied,
+    args = array of args defined in command.subcmd1.parameters,
+    callback = something something error something sucks something yes,*/
+    callback(false);
+}
+
+function subcmd2function(bos, msg, args, callback) {
+    bot.queueMessage(msg.channel, "Subcmd2 Works!", function (msg2) {
+        bot.updateMessage(msg2, "Subcm2 Works!\n Message Edtied from Callback!");
+    });
+}

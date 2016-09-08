@@ -11,7 +11,9 @@ module.exports = {
                 prefix: "test",
                 permission: "test1",
                 parameters: [],
-                handler: test1
+                handler: test1,
+                usage: "test1",
+                help: "Test command 1"
             },
 
             "test2": {
@@ -23,16 +25,18 @@ module.exports = {
                     type: "string",
                     req: true
                 }],
-                handler: test2
+                handler: test2,
+                usage: "test2 <string>",
+                help: "Prints out string with some text"
             }
         }
     }
 }
 
-function test1(callback) {
-    callback(false, "Test1 Works.");
+function test1(bot, msg) {
+    bot.queueMessage(msg.channel, "Test1 Module Works.");
 }
 
-function test2(callback, args) {
-    callback(false, "I've got this as a parameter: " + args.name);
+function test2(bot, msg, args) {
+    bot.queueMessage(msg.channel, "Test2 Module returned parameter: " + args[0]);
 }

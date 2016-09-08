@@ -1,4 +1,5 @@
 var fs = require('fs');
+var helper = require('../helper.js');
 
 const fspath = "./modules/";
 const path = "../modules/";
@@ -33,12 +34,28 @@ CommandFactory.prototype.loadModules = function(callback) {
     var files = fs.readdirSync(fspath);
     files.forEach(function(f) {
         var isDir = fs.statSync(fspath + f);
-        if (!isDir.isDirectory())
+        if (!isDir.isDirectory() && helper.scontains(f, ".js"))
             self.loadModule(f, path + f, function(err, msg) {
                 callback(err, msg)
             });
     });
     callback(false, "Plugins loaded.");
+}
+
+CommandFactory.prototype.getHelpString = function() {
+    var result = "```xl\n";
+    modules.forEach(mod => {
+        result += `[${mod.moduleName}] - Perm: ${mod.permission}
+            By: ${mod.author}, Version: ${mod.version}
+            Commands:`;
+        mod.subcommands.forEach(sub => {
+            result += `          [${sub.name}] - Prefix: ${prefix} 
+                Permission: ${sub.permission}
+                Parameters: ${parameters.map(par => par.name + ": " + par.type + " [" + par.req + "]").join('\n          ')}` 
+        });
+    });
+    result += "\n```";
+    return result;
 }
 
 CommandFactory.prototype.loadModule = function(name, path, callback) {

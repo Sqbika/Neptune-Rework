@@ -3,6 +3,7 @@ var log;
 var factory;
 var pSystem;
 var bot;
+var config = require('../config.json');
 
 module.exports = CommandExecutor;
 
@@ -14,11 +15,13 @@ function CommandExecutor(cmdFactory, PSystem, DBot, Helper, Log) {
     log = Log;
 }
 
-CommandExecutor.prototype.tryExec = function(command, parameters, userID, callback) {
+CommandExecutor.prototype.tryExec = function(command, parameters, userID, message, callback) {
     var command = factory.getSubCommand(command);
     var self = this;
     if (command == -1) {
         callback(true, "Command Not Found.");
+    } else if (hardCodedMethodsCauseICantCode(command, bot, message)) {
+        //lol useless whitespace >.>
     } else if (pSystem.hasPermission(userID, command.permission, function(err, msg) {
             helper.handleCallback(err, msg)
         })) {
@@ -26,11 +29,11 @@ CommandExecutor.prototype.tryExec = function(command, parameters, userID, callba
             var args = self.argParser(command, parameters);
             if (checkParameters(args, command)) {
                 log.log("User " + userID + " issued command: " + command.prefix, "LOG");
-                command.handler(function(err, msg) {
+                command.handler(bot, message, args, function(err, msg) {
                     callback(err, msg);
-                }, args);
+                });
             } else {
-                callback(true, "Parameter error.");
+                callback(true, "Parameter error. \nUsage: " + prefix + command.usage);
             }
         } catch (e) {
             log.log("Error occured while executing command. Error: " + e, "ERROR");
@@ -38,6 +41,16 @@ CommandExecutor.prototype.tryExec = function(command, parameters, userID, callba
         }
     } else {
         callback(true, "No Permission!");
+    }
+}
+
+function hardCodedMethodsCauseICantCode(command, bot, message) {
+    switch(command) {
+        case "help":
+            bot.queueMessage(message.channel, cmdFactory.getHelpString());
+            return true;
+        default:
+            return false;
     }
 }
 

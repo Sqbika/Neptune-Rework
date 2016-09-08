@@ -5,58 +5,64 @@ var Nepify = require('./core_modules/nepify.js');
 var helper = require('./helper.js');
 var execPath = require('./core_modules/commandExec.js');
 var PSystem = require('./core_modules/permission/permissionSystem.js');
-
+var async = require('async');
 var cmdFactory = new (require('./core_modules/commandFactory.js'));
 
 
-Discord.Client.prototype.queueMessage = function(channel, message) {
+Discord.Client.prototype.queueMessage = function(channel, message, callback) {
     function queueIt(channel, message) {
-        messageQueue.push({
+        sendAsyncMessage({
             channel: channel,
             message: message
-        });
+        }, callback);
     }
     if (message.length > 1990) {
-        sendIt(channel, "It's a bit length message. Let me split it for you!");
+        message = "It's a bit lengthy message. Let me split it for you!\n" + message;
         var chunks = chunkMessage(message);
-        chunks.forEach(m => queueIt(channel, message));
+        //console.log(chunks.length);
+        chunks.forEach(m => {
+            queueIt(channel, m);
+        });
     } else {
         queueIt(channel, message);
     }
-    rollChat();
 }
 
-var messageQueue = [];
+var outbound = {};
 
-function trySend(msg, callback) {
-    bot.sendMessage(msg.channel, msg.message, function(err, msg) {
-        if (err) {
-            if (err == 429) {
-                log.log("Rate Limited. Trying again in 2 seconds.", "LOG");
-                setTimeout(function() {
-                    trySend(callback)
-                }, 2000);
-            } else log.log("Cannot send message. Error:" + err, "ERROR");
-        }
-        else {
-            callback(err, msg);
-        }
-    });
+function sendAsyncMessage(message, callback) {
+    var self = this;
+    function trySend(task, callback) {
+        bot.sendMessage(task.channel.id, task.message, function(err, msg) {
+            if (err) {
+                if (err == 429) {
+                    log.log("Rate Limited. Trying again in 2 seconds.", "LOG");
+                    setTimeout(function() {
+                        trySend(task, callback)
+                    }, 2000);
+                } else {
+                    log.log("Cannot send message. Error:" + err, "ERROR");
+                }
+            } else {
+                callback(msg);
+            }
+        });
+    }
+    
+    if(!outbound[message.channel.id]) {
+        outbound[message.channel.id] = async.queue(trySend, 1);
+    }
+
+    outbound[message.channel.id].push(message, callback);
 }
 
-function rollChat() {
-    var msg = messageQueue.shift();
-    trySend(msg, function (err, msg) {
-        if (!err) {
-            rollChat();
-        }
-    });
-}
 
-Discord.Client.prototype.chunkMessage = function(message) {
+
+
+function chunkMessage(message) {
     //Source: Windsdon
     //Github: https://github.com/Windsdon/discord-bot-core/blob/master/lib/discord-bot.js
-    chunkSize = chunkSize || 1990;
+    var chunkSize = 1800;
     var preChunks = [];
     message.split("\n").forEach(function(v) {
         if (v.length < chunkSize) {
@@ -89,7 +95,7 @@ Discord.Client.prototype.chunkMessage = function(message) {
         } else {
             if (/```/gi.test(chunks[chunks.length - 1])) {
                 chunks[chunks.length - 1] += "```";
-                chunks.push("```" + str + "\n");
+                chunks.push("```xl\n" + str + "\n");
             } else {
                 chunks.push(str + "\n");
             }
@@ -141,21 +147,13 @@ bot.on("ready", function() {
 
 bot.on("message", function(msg) {
     if (msg.content.split(' ')[0] == config.prefix) {
-        if (msg.content.split(' ')[1] == "eval"){
-            try {
-            bot.sendMessage(msg.channel, eval(msg.content.substring(9)));
-            } catch (e) { bot.sendMessage(msg.channel, e) }
-        } else {
         var pCommand = exec.stringParser(msg.content);
-        exec.tryExec(pCommand.subCommand, pCommand.parameters, msg.author.id, function (err, errMsg){
-            if (!err) {
-                bot.queueMessage(msg.channel, errMsg);
-            } else { 
+        exec.tryExec(pCommand.subCommand, pCommand.parameters, msg.author.id, msg,function (err, errMsg){
+            if (err) { 
                 helper.handleCallback(err, errMsg); 
                 bot.queueMessage(msg.channel, "[Error]: " + errMsg);
             }
         });
-        }
     }
 });
 

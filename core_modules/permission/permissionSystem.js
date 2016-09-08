@@ -78,6 +78,11 @@ PermissionSystem.prototype.hasPermission = function(user, permission) {
     else
         uID = user.id;
 
+    var perm = {
+        module: permission.split('.')[0],
+        command: permission.split('.')[1]
+    };
+
     if (permissions.config.owner == uID)
         return true;
 
@@ -92,13 +97,11 @@ PermissionSystem.prototype.hasPermission = function(user, permission) {
         if (helper.scontains(permissions.users[uID], "default")) {
             permissionList.concat(permissions.config.default);
         }
-        if (helper.scontains(permissionList, permission)) {
-            return true;
-        } else {
-            return false;
-        }
+        
     } else {
         permissions.users[uID] = ["default"];
         permissionList = permissions.config.default;
     }
+
+
 }
