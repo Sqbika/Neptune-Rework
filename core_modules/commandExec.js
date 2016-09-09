@@ -20,8 +20,6 @@ CommandExecutor.prototype.tryExec = function(command, parameters, userID, messag
     var self = this;
     if (command == -1) {
         callback(true, "Command Not Found.");
-    } else if (hardCodedMethodsCauseICantCode(command, bot, message)) {
-        //lol useless whitespace >.>
     } else if (pSystem.hasPermission(userID, command.permission, function(err, msg) {
             helper.handleCallback(err, msg)
         })) {
@@ -41,16 +39,6 @@ CommandExecutor.prototype.tryExec = function(command, parameters, userID, messag
         }
     } else {
         callback(true, "No Permission!");
-    }
-}
-
-function hardCodedMethodsCauseICantCode(command, bot, message) {
-    switch(command) {
-        case "help":
-            bot.queueMessage(message.channel, cmdFactory.getHelpString());
-            return true;
-        default:
-            return false;
     }
 }
 

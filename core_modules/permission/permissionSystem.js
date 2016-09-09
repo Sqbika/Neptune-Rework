@@ -39,10 +39,10 @@ PermissionSystem.prototype.addPermission = function(user, permission, callback) 
     try {
         if (helper.isNumeric(user)) {
             permissions.users[user].permission.push(permission);
-            callback(false, "Added permission");
+            callback(false, "Added permission [" + permission + "] to <" + user + ">");
         } else {
             permissions.users[user.id].permission.push(permission);
-            callback(false, "Added permission");
+            callback(false, "Added permission [" + permission + "] to <" + user.id + ">");
         }
     } catch (e) {
         callback(true, "Permission Override Failed: " + e);
