@@ -103,5 +103,22 @@ PermissionSystem.prototype.hasPermission = function(user, permission) {
         permissionList = permissions.config.default;
     }
 
+    permissionList.forEach(m => {
 
+        if (m == '*.*')
+            return true;
+
+        var permTo = {
+            module: permission.split('.')[0],
+            command: permission.split('.')[1]
+        };
+
+        if (permTo.module == perm.module) {
+            if (permTo.command == '*' || permTo.command == perm.command) {
+                return true;
+            }
+        }
+    });
+
+    return false;
 }
