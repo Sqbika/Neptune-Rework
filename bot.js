@@ -8,6 +8,25 @@ var PSystem = require('./core_modules/permission/permissionSystem.js');
 var async = require('async');
 var cmdFactory = new (require('./core_modules/commandFactory.js'));
 
+Discord.Client.prototype.resolveUser = function (usrStuff, bot) {
+    if (helper.isNumeric(helper.cleanIt(usrStuff)))
+    {
+        return bot.members.get('id', helper.cleanIt(usrStuff));
+    } else if (usrStuff.id) {
+        return usrStuff;
+    } else {
+        if (bot.members.get('nickname', usrStuff)) {
+            return bot.members.get('nickname', usrStuff);
+        }
+        if (bot.members.get('name', usrStuff)) {
+            return bot.members.get('name', usrStuff);
+        }
+    }
+
+    return undefined;
+}
+
+
 
 Discord.Client.prototype.queueMessage = function(channel, message, callback) {
     function queueIt(channel, message) {
@@ -105,6 +124,10 @@ function chunkMessage(message) {
     return chunks;
 }
 
+Discord.Client.prototype.pSystem = PSystem;
+Discord.Client.prototype.cExec = execPath;
+Discord.Client.prototype.cfactory = cmdFactory;
+
 var DEV = false;
 
 var log = new Nepify();
@@ -112,6 +135,10 @@ helper.init(log);
 var bot = new Discord.Client();
 var pSystem = new PSystem(log, helper);
 var exec = new execPath(cmdFactory, pSystem, bot, helper, log);
+
+bot.pSystem = pSystem;
+bot.cExec = exec;
+
 
 
 process.argv.forEach(function(val, index, array) {
