@@ -22,19 +22,22 @@ Discord.Client.prototype.resolveUser = function(usrStuff, bot) {
         }
     }
 
-    return undefined;
+    //return undefined;
 }
 
 Discord.Client.prototype.resolveChannel = function(channel, bot) {
+
+    var result = undefined;
+
     if (channel.id) {
-        return channel;
-    } else if (helper.isNumber(helper.cleanIt(channel))) {
-        return bot.channels.get('id', channel);
-    } else if (bot.channels.get('name', channel)) {
-        return bot.channels.get('name', channel);
+        result = channel;
+    } else if (helper.isNumeric(helper.cleanIt(channel))) {
+        result = bot.channels.get(helper.cleanIt(channel));
+    } else if (bot.channels.get(channel)) {
+        result = bot.channels.get(channel);
     }
 
-    return undefined;
+   return result;
 }
 
 
@@ -64,7 +67,8 @@ function sendAsyncMessage(message, callback) {
     var self = this;
 
     function trySend(task, callback) {
-        var channel = bot.resolveChannel(task.channel);
+        var channel = bot.resolveChannel(task.channel, bot);
+        console.log(channel + " - " + task.channel);
         channel.sendMessage(task.message).then(callback)
             .catch(err => {
                 if (err == 429) {
@@ -136,7 +140,7 @@ function chunkMessage(message) {
 
 Discord.Client.prototype.pSystem = PSystem;
 Discord.Client.prototype.cExec = execPath;
-Discord.Client.prototype.cfactory = cmdFactory;
+Discord.Client.prototype.cFactory = cmdFactory;
 
 var DEV = false;
 

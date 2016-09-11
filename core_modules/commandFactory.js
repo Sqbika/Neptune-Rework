@@ -45,14 +45,11 @@ CommandFactory.prototype.loadModules = function(callback) {
 CommandFactory.prototype.getHelpString = function() {
     var result = "```xl\n";
     modules.forEach(mod => {
-        result += `[${mod.moduleName}] - Perm: ${mod.permission}
-            By: ${mod.author}, Version: ${mod.version}
-            Commands:`;
+        result += "[" + mod.moduleName + "] - Perm: " + mod.permission + "\n By: " + mod.author +", Version: " + mod.version + "\n Commands: \n";
         mod.subcommands.forEach(sub => {
-            result += `          [${sub.name}] - Prefix: ${prefix} 
-                Permission: ${sub.permission}
-                Parameters: ${parameters.map(par => par.name + ": " + par.type + " [" + par.req + "]").join('\n          ')}` 
+            result += "          ["+sub.name+"] - Prefix: " + sub.prefix + "\n          Permission: " + sub.permission + "\n          Parameters: \n" + sub.parameters.map(par => "          " +par.id + ": " + par.type + " [" + par.req + "]").join('\n') + "\n\n";
         });
+        result+= "\n";
     });
     result += "\n```";
     return result;

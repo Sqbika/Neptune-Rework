@@ -20,5 +20,5 @@ module.exports = {
 }
 
 function help (bot, msg) {
-    bot.queueMessage(msg.channel, bot.cFactory.getHelpString);
+    bot.queueMessage(msg.channel, bot.cFactory.getHelpString());
 } 
