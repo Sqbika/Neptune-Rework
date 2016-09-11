@@ -6,14 +6,13 @@ var helper = require('./helper.js');
 var execPath = require('./core_modules/commandExec.js');
 var PSystem = require('./core_modules/permission/permissionSystem.js');
 var async = require('async');
-var cmdFactory = new (require('./core_modules/commandFactory.js'));
+var cmdFactory = new(require('./core_modules/commandFactory.js'));
 
-Discord.Client.prototype.resolveUser = function (usrStuff, bot) {
-    if (helper.isNumeric(helper.cleanIt(usrStuff)))
-    {
-        return bot.members.get('id', helper.cleanIt(usrStuff));
-    } else if (usrStuff.id) {
+Discord.Client.prototype.resolveUser = function(usrStuff, bot) {
+    if (usrStuff.id) {
         return usrStuff;
+    } else if (helper.isNumeric(helper.cleanIt(usrStuff))) {
+        return bot.members.get('id', helper.cleanIt(usrStuff));
     } else {
         if (bot.members.get('nickname', usrStuff)) {
             return bot.members.get('nickname', usrStuff);
@@ -26,13 +25,13 @@ Discord.Client.prototype.resolveUser = function (usrStuff, bot) {
     return undefined;
 }
 
-Discord.Client.prototype.resolveChannel = function (channel, bot) {
-    if (helper.isNumber(helper.cleanIt(channel))) {
-        return bot.channels.get('id', channel);
-    } else if (channel.id) {
+Discord.Client.prototype.resolveChannel = function(channel, bot) {
+    if (channel.id) {
         return channel;
+    } else if (helper.isNumber(helper.cleanIt(channel))) {
+        return bot.channels.get('id', channel);
     } else if (bot.channels.get('name', channel)) {
-            return bot.channels.get('name', channel);
+        return bot.channels.get('name', channel);
     }
 
     return undefined;
@@ -63,10 +62,11 @@ var outbound = {};
 
 function sendAsyncMessage(message, callback) {
     var self = this;
+
     function trySend(task, callback) {
         var channel = bot.resolveChannel(task.channel);
         channel.sendMessage(task.message).then(callback)
-        .catch(err => {
+            .catch(err => {
                 if (err == 429) {
                     log.log("Rate Limited. Trying again in 2 seconds.", "LOG");
                     setTimeout(function() {
@@ -75,10 +75,10 @@ function sendAsyncMessage(message, callback) {
                 } else {
                     log.log("Cannot send message. Error:" + err, "ERROR");
                 }
-        });
+            });
     }
-    
-    if(!outbound[message.channel.id]) {
+
+    if (!outbound[message.channel.id]) {
         outbound[message.channel.id] = async.queue(trySend, 1);
     }
 
@@ -165,7 +165,7 @@ if (DEV) {
 ////
 
 /* Initializaton phase */
-cmdFactory.loadModules(function (err, msg) {
+cmdFactory.loadModules(function(err, msg) {
     helper.handleCallback(err, msg);
 });
 
@@ -175,7 +175,7 @@ bot.login(auth.key);
 
 bot.on("ready", function() {
     var readyTime = (new Date() - INITIALIZATION_MS);
-    bot.client.setStatus('online', config.playing);
+    //bot.client.setStatus('online', config.playing);
     if (config.extendedLog) {
         log.log("Logged in, Took " + readyTime + " ms", "INFO");
 
@@ -185,9 +185,9 @@ bot.on("ready", function() {
 bot.on("message", function(msg) {
     if (msg.content.split(' ')[0] == config.prefix) {
         var pCommand = exec.stringParser(msg.content);
-        exec.tryExec(pCommand.subCommand, pCommand.parameters, msg.author.id, msg,function (err, errMsg){
-            if (err) { 
-                helper.handleCallback(err, errMsg); 
+        exec.tryExec(pCommand.subCommand, pCommand.parameters, msg.author.id, msg, function(err, errMsg) {
+            if (err) {
+                helper.handleCallback(err, errMsg);
                 bot.queueMessage(msg.channel, "[Error]: " + errMsg);
             }
         });
@@ -198,6 +198,3 @@ bot.on("message", function(msg) {
 
 
 /*Bot Command Stuff */
-
-
-
