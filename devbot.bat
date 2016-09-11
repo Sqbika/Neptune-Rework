@@ -1,1 +1,2 @@
 node bot dev
+pause
