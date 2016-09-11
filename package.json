@@ -1,0 +1,30 @@
+{
+  "name": "neptune-rework",
+  "version": "0.1.0",
+  "description": "Discord Chatbot based on Discord.JS with additional implementations",
+  "main": "bot.js",
+  "dependencies": {
+    "async": "^2.0.1",
+    "chalk": "^1.1.3",
+    "discord.js": "^9.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sqbika/Neptune-Rework.git"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "neptune"
+  ],
+  "author": "Sqbika",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Sqbika/Neptune-Rework/issues"
+  },
+  "homepage": "https://github.com/Sqbika/Neptune-Rework#readme"
+}
