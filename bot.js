@@ -175,7 +175,7 @@ bot.login(auth.key);
 
 bot.on("ready", function() {
     var readyTime = (new Date() - INITIALIZATION_MS);
-    bot.setPlayingGame(config.playing);
+    bot.setStatus('online', config.playing);
     if (config.extendedLog) {
         log.log("Logged in, Took " + readyTime + " ms", "INFO");
 
