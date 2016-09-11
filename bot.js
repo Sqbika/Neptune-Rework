@@ -26,6 +26,18 @@ Discord.Client.prototype.resolveUser = function (usrStuff, bot) {
     return undefined;
 }
 
+Discord.Client.prototype.resolveChannel = function (channel, bot) {
+    if (helper.isNumber(helper.cleanIt(channel))) {
+        return bot.channels.get('id', channel);
+    } else if (channel.id) {
+        return channel;
+    } else if (bot.channels.get('name', channel)) {
+            return bot.channels.get('name', channel);
+    }
+
+    return undefined;
+}
+
 
 
 Discord.Client.prototype.queueMessage = function(channel, message, callback) {
@@ -52,8 +64,9 @@ var outbound = {};
 function sendAsyncMessage(message, callback) {
     var self = this;
     function trySend(task, callback) {
-        bot.sendMessage(task.channel.id, task.message, function(err, msg) {
-            if (err) {
+        var channel = bot.resolveChannel(task.channel);
+        channel.sendMessage(task.message).then(callback)
+        .catch(err => {
                 if (err == 429) {
                     log.log("Rate Limited. Trying again in 2 seconds.", "LOG");
                     setTimeout(function() {
@@ -62,9 +75,6 @@ function sendAsyncMessage(message, callback) {
                 } else {
                     log.log("Cannot send message. Error:" + err, "ERROR");
                 }
-            } else {
-                callback(msg);
-            }
         });
     }
     
