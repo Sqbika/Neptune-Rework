@@ -171,7 +171,7 @@ cmdFactory.loadModules(function (err, msg) {
 
 
 
-bot.loginWithToken(auth.key);
+bot.login(auth.key);
 
 bot.on("ready", function() {
     var readyTime = (new Date() - INITIALIZATION_MS);
